@@ -21,13 +21,13 @@ pygui(true)
     e_PC = 0.5
     e_PR = 0.5
     m_C = 0.5
-    m_P = 0.5
+    m_P = 0.2
     a_CR_litt = 1.5
-    a_CR_pel = 3.0
+    a_CR_pel = 1.5
     a_PR_litt = 0
     a_PR_pel = 0
     a_PC_litt = 0.5
-    a_PC_pel = 2.9
+    a_PC_pel = 1.8
     noise = 0.1
     
 end
@@ -87,7 +87,7 @@ end
 ## equilibrium check for parameter range -- find where all species coexist (interior equilibrium)
 
 
-coup_vals = 0.0:0.05:7.7
+coup_vals = 0.0:0.05:1.75
 coup_hold = fill(0.0,length(coup_vals),6)
 
 u0 = [0.5,0.5, 0.3, 0.3, 0.3]
@@ -110,9 +110,9 @@ for i=1:length(coup_vals)
     prob = ODEProblem(coupling_model!, u0, t_span, p)
     sol = solve(prob, reltol = 1e-8, atol = 1e-8)
     grid = sol(ts)
-    eq = nlsolve((du, u) -> coupling_model!(du, u, p, 0.0), grid.u[end]).zero
+    equ = nlsolve((du, u) -> coupling_model!(du, u, p, 0.0), grid.u[end]).zero
     coup_hold[i,1] = coup_vals[i]
-    coup_hold[i,2:end] = eq
+    coup_hold[i,2:end] = equ
     println(coup_hold[i,:])
 end
 
@@ -176,7 +176,7 @@ for i=1:length(coup_vals)
     prob = ODEProblem(coupling_model!, u0, t_span, p)
     sol = solve(prob, reltol = 1e-8, atol = 1e-8)
     grid = sol(ts)
-    eq = nlsolve((du, u) -> coupling_model!(du, u, p, 0.0), grid.u[end]).zero
+    equ = nlsolve((du, u) -> coupling_model!(du, u, p, 0.0), grid.u[end]).zero
     coupling_jac = jac(equ, coupling_model, p)
     max_eig = maximum(real.(eigvals(coupling_jac)))
     maxeig_hold[i,1] = coup_vals[i]
